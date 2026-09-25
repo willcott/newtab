@@ -148,27 +148,14 @@ body {
 .app-shell {
   display: flex;
   min-height: 100svh;
-  max-width: 1440px;
   margin: 0 auto;
   padding: 28px clamp(20px, 4vw, 64px) 22px;
   flex-direction: column;
   gap: 28px;
 }
 
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  border-bottom: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
-  padding-bottom: 22px;
-}
-
-.brand-lockup,
-.header-actions,
-.category-heading,
+.section-heading,
 .bookmark-link,
-.toolbar-eyebrow,
 .edit-toolbar-actions,
 .edit-toolbar-controls,
 .toolbar-control > label,
@@ -177,54 +164,8 @@ body {
   align-items: center;
 }
 
-.brand-lockup {
-  gap: 11px;
-}
-
-.brand-mark {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: 10px;
-  color: var(--primary-foreground);
-  background: var(--primary);
-  box-shadow: 4px 4px 0 color-mix(in oklch, var(--accent) 80%, transparent);
-}
-
-.brand-mark svg {
-  width: 17px;
-  height: 17px;
-}
-
-.brand-name,
-.brand-subtitle,
-.toolbar-eyebrow,
-.edit-toolbar-intro p,
-.app-footer,
 .bookmark-empty-state p {
   margin: 0;
-}
-
-.brand-name {
-  color: var(--foreground);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.brand-subtitle {
-  margin-top: 2px;
-  color: var(--muted-foreground);
-  font-size: 12px;
-}
-
-.header-actions {
-  gap: 12px;
-}
-
-.storage-note {
-  color: var(--muted-foreground);
-  font-size: 12px;
 }
 
 .page-content {
@@ -232,42 +173,16 @@ body {
 }
 
 .edit-toolbar {
-  display: grid;
-  grid-template-columns: minmax(180px, 1fr) auto auto;
+  display: flex;
   align-items: end;
+  justify-content: space-between;
   gap: 24px;
-  border-top: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
   border-bottom: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
-  padding: 18px 0;
-}
-
-.edit-toolbar-intro {
-  min-width: 0;
-}
-
-.toolbar-eyebrow {
-  gap: 7px;
-  color: var(--primary);
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.toolbar-eyebrow svg,
-.toolbar-control label svg {
-  width: 14px;
-  height: 14px;
-}
-
-.edit-toolbar-intro p {
-  margin-top: 4px;
-  color: var(--muted-foreground);
-  font-size: 12px;
+  padding: 14px 0;
 }
 
 .edit-toolbar-controls {
-  gap: 24px;
+  gap: 20px;
 }
 
 .toolbar-control {
@@ -275,8 +190,7 @@ body {
 }
 
 .toolbar-control > label {
-  justify-content: space-between;
-  gap: 7px;
+  justify-content: flex-start;
   margin-bottom: 8px;
   color: var(--muted-foreground);
   font-size: 11px;
@@ -287,14 +201,12 @@ body {
   width: 116px;
 }
 
-.toolbar-height-control {
-  width: min(220px, 22vw);
+.toolbar-scale-control {
+  width: 142px;
 }
 
-.control-value {
-  margin-left: auto;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
+.toolbar-scale-select {
+  width: 142px;
 }
 
 .edit-toolbar-actions {
@@ -316,25 +228,59 @@ body {
 }
 
 .bookmark-column {
+  display: flex;
   min-width: 0;
+  min-height: 44px;
+  flex-direction: column;
+  gap: 26px;
+  border-radius: 8px;
+}
+
+.bookmark-column.is-drop-target {
+  background: color-mix(in oklch, var(--accent) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 55%, transparent);
+}
+
+.column-drop-zone {
+  min-height: 24px;
+  border: 1px dashed color-mix(in oklch, var(--border) 78%, transparent);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--card) 35%, transparent);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.column-drop-zone.is-drop-target {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--accent) 24%, transparent);
+}
+
+.section-item {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--border) 78%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--card) 42%, transparent);
+  box-shadow: 0 8px 22px color-mix(in oklch, var(--foreground) 4%, transparent);
   transition: opacity 160ms ease, transform 160ms ease;
 }
 
-.bookmark-column.is-dragging,
+.section-item.is-dragging,
 .bookmark-item.is-dragging {
   opacity: 0.45;
 }
 
-.category-heading {
-  min-height: 36px;
-  gap: 7px;
-  margin-bottom: 10px;
-  border-top: 2px solid var(--primary);
-  padding-top: 9px;
+.section-heading {
+  min-height: 44px;
+  gap: 8px;
+  margin: 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 72%, transparent);
+  padding: 10px 12px;
+  background: color-mix(in oklch, var(--muted) 42%, transparent);
 }
 
-.category-heading h2 {
+.section-heading h2 {
   min-width: 0;
+  flex: 1;
   margin: 0;
   overflow: hidden;
   color: var(--foreground);
@@ -345,41 +291,48 @@ body {
   white-space: nowrap;
 }
 
-.category-count {
+.section-count {
   flex: none;
   color: var(--muted-foreground);
   font-size: 11px;
-  font-variant-numeric: tabular-nums;
+  font-weight: 560;
+  white-space: nowrap;
 }
 
-.category-drag-handle,
-.category-edit-button,
+.section-drag-handle,
+.section-collapse-button,
+.section-edit-button,
 .bookmark-action,
 .bookmark-drag-handle {
   flex: none;
   color: var(--muted-foreground);
 }
 
-.category-drag-handle {
+.section-drag-handle {
   margin-left: -6px;
 }
 
-.category-edit-button {
+.section-collapse-button {
+  margin-left: -6px;
+}
+
+.section-edit-button {
   margin-left: auto;
 }
 
-.category-bookmarks {
+.section-bookmarks {
   display: flex;
   min-height: 18px;
   flex-direction: column;
   gap: 8px;
   border: 1px dashed transparent;
-  border-radius: 8px;
-  padding: 2px;
+  border-radius: 0 0 9px 9px;
+  padding: 10px;
+  background: color-mix(in oklch, var(--background) 26%, transparent);
   transition: border-color 160ms ease, background-color 160ms ease;
 }
 
-.category-bookmarks.is-drop-target {
+.section-bookmarks.is-drop-target {
   border-color: var(--primary);
   background: color-mix(in oklch, var(--accent) 24%, transparent);
 }
@@ -420,8 +373,8 @@ body {
 .bookmark-favicon {
   position: relative;
   display: grid;
-  width: 25px;
-  height: 25px;
+  width: var(--bookmark-favicon-size);
+  height: var(--bookmark-favicon-size);
   flex: none;
   place-items: center;
   overflow: hidden;
@@ -433,8 +386,8 @@ body {
 .bookmark-favicon-image,
 .bookmark-fallback-icon {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: var(--bookmark-favicon-icon-size);
+  height: var(--bookmark-favicon-icon-size);
 }
 
 .bookmark-favicon-image {
@@ -453,7 +406,7 @@ body {
 .bookmark-title {
   min-width: 0;
   overflow: hidden;
-  font-size: 13px;
+  font-size: var(--bookmark-title-size);
   font-weight: 560;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -462,7 +415,7 @@ body {
 .bookmark-arrow {
   margin-left: auto;
   color: var(--muted-foreground);
-  font-size: 16px;
+  font-size: var(--bookmark-arrow-size);
   line-height: 1;
   opacity: 0;
   transition: opacity 140ms ease;
@@ -492,7 +445,7 @@ body {
   opacity: 1;
 }
 
-.category-empty {
+.section-empty {
   display: grid;
   min-height: var(--bookmark-height);
   place-items: center;
@@ -539,19 +492,11 @@ body {
   margin-top: 14px;
 }
 
-.app-footer {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: var(--muted-foreground);
-  font-size: 11px;
-}
-
-.footer-rule {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--primary);
+.edit-mode-button {
+  position: fixed;
+  right: clamp(16px, 4vw, 64px);
+  bottom: clamp(16px, 3vw, 30px);
+  z-index: 20;
 }
 
 .editor-dialog {
@@ -621,31 +566,12 @@ body {
   .bookmark-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .edit-toolbar {
-    grid-template-columns: 1fr auto;
-  }
-
-  .edit-toolbar-intro {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 680px) {
   .app-shell {
     gap: 22px;
     padding: 20px 16px 18px;
-  }
-
-  .app-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding-bottom: 18px;
-  }
-
-  .header-actions {
-    justify-content: space-between;
-    width: 100%;
   }
 
   .bookmark-grid {
@@ -666,8 +592,9 @@ body {
     gap: 14px;
   }
 
-  .toolbar-height-control {
-    width: min(220px, 58vw);
+  .toolbar-scale-control,
+  .toolbar-scale-select {
+    width: min(142px, 48vw);
   }
 
   .edit-toolbar-actions {

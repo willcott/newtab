@@ -1,4 +1,4 @@
-import { Columns3, LayoutPanelTop, Plus, Ruler } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -8,37 +8,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { LAYOUT_LIMITS, type LayoutSettings } from '@/types/bookmarks'
+import {
+  BOOKMARK_SCALE_OPTIONS,
+  LAYOUT_LIMITS,
+  type LayoutSettings,
+} from '@/types/bookmarks'
 
 type EditToolbarProps = {
   settings: LayoutSettings
   onSettingsChange: (settings: Partial<LayoutSettings>) => void
   onAddBookmark: () => void
-  onAddCategory: () => void
+  onAddSection: () => void
 }
 
 export function EditToolbar({
   settings,
   onSettingsChange,
   onAddBookmark,
-  onAddCategory,
+  onAddSection,
 }: EditToolbarProps) {
   return (
     <section className="edit-toolbar" aria-label="Page settings">
-      <div className="edit-toolbar-intro">
-        <span className="toolbar-eyebrow">
-          <LayoutPanelTop />
-          Edit mode
-        </span>
-        <p>Arrange the page, then return to your shortcuts.</p>
-      </div>
       <div className="edit-toolbar-controls">
         <div className="toolbar-control">
-          <Label htmlFor="column-count">
-            <Columns3 />
-            Columns
-          </Label>
+          <Label htmlFor="column-count">Columns</Label>
           <Select
             value={String(settings.columns)}
             onValueChange={(value) => {
@@ -67,32 +60,35 @@ export function EditToolbar({
             </SelectContent>
           </Select>
         </div>
-        <div className="toolbar-control toolbar-height-control">
-          <Label htmlFor="bookmark-height">
-            <Ruler />
-            Bookmark height
-            <span className="control-value">{settings.bookmarkHeight}px</span>
-          </Label>
-          <Slider
-            id="bookmark-height"
-            aria-label="Bookmark height"
-            min={LAYOUT_LIMITS.minBookmarkHeight}
-            max={LAYOUT_LIMITS.maxBookmarkHeight}
-            step={4}
-            value={[settings.bookmarkHeight]}
+        <div className="toolbar-control toolbar-scale-control">
+          <Label htmlFor="bookmark-scale">Scale</Label>
+          <Select
+            value={settings.bookmarkScale}
             onValueChange={(value) => {
-              const nextValue = Array.isArray(value) ? value[0] : value
-              if (typeof nextValue === 'number') {
-                onSettingsChange({ bookmarkHeight: nextValue })
+              if (value) {
+                onSettingsChange({ bookmarkScale: value as LayoutSettings['bookmarkScale'] })
               }
             }}
-          />
+          >
+            <SelectTrigger id="bookmark-scale" className="toolbar-select toolbar-scale-select">
+              <SelectValue>
+                {(value) => BOOKMARK_SCALE_OPTIONS.find((option) => option.value === value)?.label}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {BOOKMARK_SCALE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="edit-toolbar-actions">
-        <Button type="button" variant="outline" onClick={onAddCategory}>
+        <Button type="button" variant="outline" onClick={onAddSection}>
           <Plus />
-          Category
+          Section
         </Button>
         <Button type="button" onClick={onAddBookmark}>
           <Plus />

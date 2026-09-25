@@ -2,46 +2,45 @@
 
 ## Product Goal
 
-Create a low-maintenance personal new-tab page that presents frequently used bookmarks as a set of user-named columns. The page is built as a static Vite bundle so it can be opened locally and used as a browser new-tab target without a server or account.
+Create a low-maintenance personal new-tab page that presents frequently used bookmarks as a set of user-named sections arranged in columns. The page is a static Vite bundle for local browser use as a new-tab target.
 
 ## Core Experience
 
 The page has two modes:
 
-- **Normal mode:** categories are displayed as columns. Each bookmark is a compact row containing a favicon and the title chosen by the user. Clicking the row navigates to the saved URL.
-- **Edit mode:** users can add, edit, and delete bookmarks; add, rename, reorder, and delete categories; move bookmarks within a category or between categories; and change the number of columns and bookmark height.
+- **Normal mode:** columns are ordered vertical containers that can hold sections or standalone bookmarks. Each bookmark is a compact row containing a favicon and the title chosen by the user. Clicking the row navigates to the saved URL. Sections contain bookmarks only and are not nested inside other sections. Section bookmark groups can be collapsed and expanded from their heading.
+- **Edit mode:** users can add, edit, and delete bookmarks; add, rename, reorder, and delete sections; move sections between or within columns; move bookmarks between columns or in and out of sections; and change the number of columns and bookmark scale. Columns provide drop targets at both the top and bottom of their contents. Moving a section also moves the bookmarks it contains. A small edit control sits in the lower-right corner.
 
-The first launch is seeded with editable examples so the layout is immediately understandable. There is always at least one category. Deleting a category with bookmarks requires choosing another category as the destination.
+The first launch is seeded with three editable sections: Work contains Jira, Outlook, and Outlook Calendar; Dev contains GitHub and AWS; Personal contains Gmail. Figma is included as a standalone bookmark. There is always at least one section. Deleting a section with bookmarks requires choosing another section as the destination.
 
 ## Technical Shape
 
 - React 19 with TypeScript and Vite.
 - shadcn/ui generated primitives backed by Base UI.
 - Tailwind CSS v4 for generated utility styles and CSS variables.
-- dnd-kit for pointer-based category and bookmark sorting.
+- dnd-kit for pointer-based column, section, and bookmark sorting.
 - Geist Variable as the local UI font dependency.
-- No backend, login, browser-extension API, or remote application state.
-
 The production Vite base is `./`, which keeps the generated CSS, JavaScript, and font paths relative to `dist/index.html`. The intended local artifact is `dist/index.html`.
 
 ## Data Model
 
-The persisted document is versioned as `newtab.bookmarks.v1`:
+The persisted document is versioned as `newtab.bookmarks.v3`:
 
 - `version`: current storage schema version.
-- `categories`: ordered objects containing `id` and user-facing `name`.
-- `bookmarks`: objects containing `id`, `categoryId`, `title`, normalized `url`, and derived `faviconUrl`.
-- `settings`: bounded `columns` and `bookmarkHeight` values.
+- `sections`: objects containing `id`, user-facing `name`, a `collapsed` state, and the ordered bookmarks contained by the section.
+- `bookmarks`: objects containing `id`, an optional `sectionId`, `title`, normalized `url`, and derived `faviconUrl`.
+- `layout`: ordered columns whose items are either a section or a standalone bookmark. Section bookmarks are not repeated in the column layout.
+- `settings`: bounded `columns` and one of five discrete bookmark scale values: extra small, small, medium, large, or extra large. Scale changes the bookmark row, title text, and favicon sizes together.
 
-State is loaded defensively. Malformed or incompatible storage falls back to the seeded defaults, and bookmark URLs are restricted to `http` and `https`. Updates are saved automatically after state changes. The storage module is the migration boundary for future schema versions.
+State is loaded defensively. Malformed or incompatible storage falls back to the seeded defaults, and bookmark URLs are restricted to `http` and `https`. Updates are saved automatically after state changes. The storage module owns schema migration.
 
 ## Favicon Strategy
 
-Favicon URLs are derived from the bookmark hostname through the Google favicon endpoint. This avoids an image upload flow and keeps the stored document small. The browser can load those icons only when network access is available; every bookmark also has a local generic icon fallback for failures or offline use.
+Favicon URLs are derived from the bookmark hostname through the Google favicon endpoint. Each bookmark also has a local generic icon fallback when its favicon cannot load.
 
 ## Visual Direction
 
-The interface is intentionally compact and scan-oriented rather than dashboard-like. Categories are unframed grid columns with a small heading rule; bookmark rows have stable heights controlled by the edit toolbar. Light and dark colors follow the operating system preference through CSS media queries. There is no separate theme setting in the first version.
+The interface is compact and scan-oriented. Columns span the full available browser width and are vertical stacks, sections are visually contained groups with a distinct heading band and inset bookmark area, and bookmark rows have stable sizes controlled by the edit controls. Standalone bookmarks remain visually separate from section contents. The edit control is a small button in the lower-right corner. Light and dark colors follow the operating system preference through CSS media queries.
 
 The application UI palette must contain only black, white, and neutral grayscale values. No colored accents, warm or cool tints, or chromatic theme tokens are allowed. Bookmark favicon logos are the intentional exception and retain their normal source colors.
 
@@ -54,15 +53,4 @@ npm run build
 npm run preview
 ```
 
-The project does not require or document a separate `npm run type-check` command. `npm run build` is the production validation command.
-
-## Non-Goals
-
-The first version deliberately excludes accounts, sync, search, import/export, custom image uploads, analytics, server persistence, and browser-extension packaging. A browser may require an extension to fully override its built-in new-tab page; this project currently supplies the standalone static HTML artifact only.
-
-## Future Considerations
-
-1. Add JSON import/export if the bookmark set needs to move between machines.
-2. Add optional local favicon storage if remote favicon services become unreliable.
-3. Package the same UI as a browser extension if direct new-tab replacement is required.
-4. Add schema migrations only when persisted data changes shape; keep them inside `src/lib/storage.ts`.
+`npm run build` is the production validation command.

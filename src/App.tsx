@@ -2,17 +2,18 @@ import {
   closestCenter,
   DndContext,
   DragOverlay,
+  pointerWithin,
   PointerSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { Check, GripVertical, Pencil, Sparkles } from 'lucide-react'
+import { Check, GripVertical, Pencil } from 'lucide-react'
 import { useState } from 'react'
 import { BookmarkEditor } from '@/components/bookmark-editor'
 import { BookmarkGrid } from '@/components/bookmark-grid'
-import { CategoryEditor } from '@/components/category-editor'
+import { SectionEditor } from '@/components/category-editor'
 import { EditToolbar } from '@/components/edit-toolbar'
 import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -20,8 +21,17 @@ import { useBookmarkStore } from '@/hooks/use-bookmark-store'
 import type { BookmarkDraft } from '@/types/bookmarks'
 
 type DragData = {
-  type: 'category' | 'bookmark' | 'category-drop'
-  categoryId?: string
+  type: 'column' | 'section' | 'section-bookmark-drop' | 'bookmark'
+  sectionId?: string | null
+  columnIndex?: number
+  containerId?: string | null
+  overItemId?: string
+  dropPosition?: 'top' | 'bottom'
+}
+
+function collisionDetectionStrategy(...args: Parameters<typeof closestCenter>) {
+  const pointerCollisions = pointerWithin(...args)
+  return pointerCollisions.length > 0 ? pointerCollisions : closestCenter(...args)
 }
 
 function App() {
@@ -29,9 +39,9 @@ function App() {
   const [editMode, setEditMode] = useState(false)
   const [bookmarkDialogOpen, setBookmarkDialogOpen] = useState(false)
   const [editingBookmarkId, setEditingBookmarkId] = useState<string | null>(null)
-  const [newBookmarkCategoryId, setNewBookmarkCategoryId] = useState<string | undefined>()
-  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false)
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null)
+  const [newBookmarkSectionId, setNewBookmarkSectionId] = useState<string | undefined>()
+  const [sectionDialogOpen, setSectionDialogOpen] = useState(false)
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -40,36 +50,32 @@ function App() {
   const editingBookmark = store.state.bookmarks.find(
     (bookmark) => bookmark.id === editingBookmarkId,
   )
-  const editingCategory = store.state.categories.find(
-    (category) => category.id === editingCategoryId,
+  const editingSection = store.state.sections.find(
+    (section) => section.id === editingSectionId,
   )
-  const activeBookmark = store.state.bookmarks.find(
-    (bookmark) => bookmark.id === activeDragId,
-  )
-  const activeCategory = store.state.categories.find(
-    (category) => category.id === activeDragId,
-  )
+  const activeBookmark = store.state.bookmarks.find((bookmark) => bookmark.id === activeDragId)
+  const activeSection = store.state.sections.find((section) => section.id === activeDragId)
 
-  function openNewBookmark(categoryId?: string): void {
+  function openNewBookmark(sectionId?: string): void {
     setEditingBookmarkId(null)
-    setNewBookmarkCategoryId(categoryId)
+    setNewBookmarkSectionId(sectionId)
     setBookmarkDialogOpen(true)
   }
 
   function openBookmarkEditor(bookmarkId: string): void {
     setEditingBookmarkId(bookmarkId)
-    setNewBookmarkCategoryId(undefined)
+    setNewBookmarkSectionId(undefined)
     setBookmarkDialogOpen(true)
   }
 
-  function openNewCategory(): void {
-    setEditingCategoryId(null)
-    setCategoryDialogOpen(true)
+  function openNewSection(): void {
+    setEditingSectionId(null)
+    setSectionDialogOpen(true)
   }
 
-  function openCategoryEditor(categoryId: string): void {
-    setEditingCategoryId(categoryId)
-    setCategoryDialogOpen(true)
+  function openSectionEditor(sectionId: string): void {
+    setEditingSectionId(sectionId)
+    setSectionDialogOpen(true)
   }
 
   function handleBookmarkSave(draft: BookmarkDraft): void {
@@ -80,11 +86,11 @@ function App() {
     }
   }
 
-  function handleCategorySave(name: string): void {
-    if (editingCategoryId) {
-      store.updateCategory(editingCategoryId, name)
+  function handleSectionSave(name: string): void {
+    if (editingSectionId) {
+      store.updateSection(editingSectionId, name)
     } else {
-      store.addCategory(name)
+      store.addSection(name)
     }
   }
 
@@ -101,8 +107,28 @@ function App() {
 
     const activeData = active.data.current as DragData | undefined
     const overData = over.data.current as DragData | undefined
-    if (activeData?.type === 'category' && overData?.type === 'category') {
-      store.reorderCategories(String(active.id), String(over.id))
+    const topColumnItemId =
+      overData?.type === 'column' &&
+      (overData.dropPosition === 'top' || String(over.id).startsWith('column-drop-top-'))
+        ? overData.overItemId ??
+          (overData.columnIndex === undefined
+            ? undefined
+            : store.state.layout[overData.columnIndex]?.[0]?.id)
+        : undefined
+    if (activeData?.type === 'section') {
+      const destinationColumnIndex = overData?.columnIndex
+      if (destinationColumnIndex === undefined) {
+        return
+      }
+      const overItemId =
+        overData?.type === 'section'
+          ? String(over.id)
+          : overData?.type === 'bookmark'
+            ? overData.containerId ?? String(over.id)
+            : overData?.type === 'section-bookmark-drop'
+              ? overData.containerId ?? overData.sectionId ?? undefined
+              : topColumnItemId
+      store.moveSection(String(active.id), destinationColumnIndex, overItemId)
       return
     }
 
@@ -110,16 +136,38 @@ function App() {
       return
     }
 
-    const destinationCategoryId =
-      overData?.type === 'bookmark' || overData?.type === 'category' || overData?.type === 'category-drop'
-        ? overData.categoryId
-        : activeData.categoryId
-    if (!destinationCategoryId) {
+    if (
+      (overData?.type === 'section' || overData?.type === 'section-bookmark-drop') &&
+      overData.sectionId
+    ) {
+      store.moveBookmark(String(active.id), {
+        type: 'section',
+        sectionId: overData.sectionId,
+        overBookmarkId: undefined,
+      })
       return
     }
 
-    const overBookmarkId = overData?.type === 'bookmark' ? String(over.id) : undefined
-    store.moveBookmark(String(active.id), destinationCategoryId, overBookmarkId)
+    if (overData?.type === 'bookmark' && overData.sectionId) {
+      store.moveBookmark(String(active.id), {
+        type: 'section',
+        sectionId: overData.sectionId,
+        overBookmarkId: String(over.id),
+      })
+      return
+    }
+
+    const destinationColumnIndex = overData?.columnIndex ?? activeData.columnIndex
+    if (destinationColumnIndex === undefined) {
+      return
+    }
+    store.moveBookmark(String(active.id), {
+      type: 'column',
+      columnIndex: destinationColumnIndex,
+      overItemId:
+        topColumnItemId ??
+        (overData?.type === 'bookmark' ? String(over.id) : undefined),
+    })
   }
 
   function handleDragCancel(): void {
@@ -130,43 +178,18 @@ function App() {
     <TooltipProvider>
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={collisionDetectionStrategy}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
         <div className="app-shell">
-          <header className="app-header">
-            <div className="brand-lockup">
-              <span className="brand-mark" aria-hidden="true">
-                <Sparkles />
-              </span>
-              <div>
-                <p className="brand-name">New tab</p>
-                <p className="brand-subtitle">
-                  {editMode ? 'Shape your shortcuts' : 'A place for the things you return to'}
-                </p>
-              </div>
-            </div>
-            <div className="header-actions">
-              {editMode && <span className="storage-note">Saved on this device</span>}
-              <Button
-                type="button"
-                variant={editMode ? 'default' : 'outline'}
-                onClick={() => setEditMode((current) => !current)}
-              >
-                {editMode ? <Check /> : <Pencil />}
-                {editMode ? 'Done' : 'Edit layout'}
-              </Button>
-            </div>
-          </header>
-
           {editMode && (
             <EditToolbar
               settings={store.state.settings}
               onSettingsChange={store.updateSettings}
               onAddBookmark={() => openNewBookmark()}
-              onAddCategory={openNewCategory}
+              onAddSection={openNewSection}
             />
           )}
 
@@ -176,15 +199,22 @@ function App() {
               editMode={editMode}
               onAddBookmark={openNewBookmark}
               onEditBookmark={openBookmarkEditor}
-              onEditCategory={openCategoryEditor}
+              onEditSection={openSectionEditor}
+              onToggleSection={store.toggleSectionCollapsed}
             />
           </main>
 
-          <footer className="app-footer">
-            <span>{store.state.categories.length} categories</span>
-            <span className="footer-rule" aria-hidden="true" />
-            <span>{store.state.bookmarks.length} bookmarks</span>
-          </footer>
+          <Button
+            type="button"
+            variant={editMode ? 'default' : 'outline'}
+            size="icon-sm"
+            className="edit-mode-button"
+            aria-label={editMode ? 'Done' : 'Edit'}
+            title={editMode ? 'Done' : 'Edit'}
+            onClick={() => setEditMode((current) => !current)}
+          >
+            {editMode ? <Check /> : <Pencil />}
+          </Button>
         </div>
 
         <DragOverlay dropAnimation={null}>
@@ -194,10 +224,10 @@ function App() {
               <span>{activeBookmark.title}</span>
             </div>
           )}
-          {!activeBookmark && activeCategory && (
+          {!activeBookmark && activeSection && (
             <div className="drag-preview">
               <GripVertical aria-hidden="true" />
-              <span>{activeCategory.name}</span>
+              <span>{activeSection.name}</span>
             </div>
           )}
         </DragOverlay>
@@ -206,21 +236,21 @@ function App() {
           key={`bookmark-editor-${bookmarkDialogOpen}-${editingBookmarkId ?? 'new'}`}
           open={bookmarkDialogOpen}
           bookmark={editingBookmark}
-          categories={store.state.categories}
-          defaultCategoryId={newBookmarkCategoryId}
+          sections={store.state.sections}
+          defaultSectionId={newBookmarkSectionId}
           onOpenChange={setBookmarkDialogOpen}
           onSave={handleBookmarkSave}
           onDelete={store.deleteBookmark}
         />
-        <CategoryEditor
-          key={`category-editor-${categoryDialogOpen}-${editingCategoryId ?? 'new'}`}
-          open={categoryDialogOpen}
-          category={editingCategory}
-          categories={store.state.categories}
-          bookmarkCount={editingCategory ? store.state.bookmarks.filter((bookmark) => bookmark.categoryId === editingCategory.id).length : 0}
-          onOpenChange={setCategoryDialogOpen}
-          onSave={handleCategorySave}
-          onDelete={store.deleteCategory}
+        <SectionEditor
+          key={`section-editor-${sectionDialogOpen}-${editingSectionId ?? 'new'}`}
+          open={sectionDialogOpen}
+          section={editingSection}
+          sections={store.state.sections}
+          bookmarkCount={editingSection ? store.state.bookmarks.filter((bookmark) => bookmark.sectionId === editingSection.id).length : 0}
+          onOpenChange={setSectionDialogOpen}
+          onSave={handleSectionSave}
+          onDelete={store.deleteSection}
         />
       </DndContext>
     </TooltipProvider>

@@ -18,40 +18,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { Category } from '@/types/bookmarks'
+import type { Section } from '@/types/bookmarks'
 
-type CategoryEditorProps = {
+type SectionEditorProps = {
   open: boolean
-  category?: Category
-  categories: Category[]
+  section?: Section
+  sections: Section[]
   bookmarkCount: number
   onOpenChange: (open: boolean) => void
   onSave: (name: string) => void
-  onDelete: (categoryId: string, destinationCategoryId?: string) => void
+  onDelete: (sectionId: string, destinationSectionId?: string) => void
 }
 
-export function CategoryEditor({
+export function SectionEditor({
   open,
-  category,
-  categories,
+  section,
+  sections,
   bookmarkCount,
   onOpenChange,
   onSave,
   onDelete,
-}: CategoryEditorProps) {
-  const [name, setName] = useState(category?.name ?? '')
-  const [destinationCategoryId, setDestinationCategoryId] = useState(
-    categories.find((item) => item.id !== category?.id)?.id ?? '',
+}: SectionEditorProps) {
+  const [name, setName] = useState(section?.name ?? '')
+  const [destinationSectionId, setDestinationSectionId] = useState(
+    sections.find((item) => item.id !== section?.id)?.id ?? '',
   )
   const [error, setError] = useState('')
-  const isEditing = Boolean(category)
-  const otherCategories = categories.filter((item) => item.id !== category?.id)
-  const canDelete = isEditing && otherCategories.length > 0
+  const isEditing = Boolean(section)
+  const destinationOptions = sections.filter((item) => item.id !== section?.id)
+  const canDelete = isEditing && destinationOptions.length > 0
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault()
     if (!name.trim()) {
-      setError('Give this category a name.')
+      setError('Give this section a name.')
       return
     }
 
@@ -60,15 +60,15 @@ export function CategoryEditor({
   }
 
   function handleDelete(): void {
-    if (!category || !canDelete) {
+    if (!section || !canDelete) {
       return
     }
-    if (bookmarkCount > 0 && !destinationCategoryId) {
-      setError('Choose where its bookmarks should move.')
+    if (bookmarkCount > 0 && !destinationSectionId) {
+      setError('Choose where its contents should move.')
       return
     }
 
-    onDelete(category.id, destinationCategoryId || undefined)
+    onDelete(section.id, destinationSectionId || undefined)
     onOpenChange(false)
   }
 
@@ -76,16 +76,16 @@ export function CategoryEditor({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="editor-dialog">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit category' : 'Add category'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit section' : 'Add section'}</DialogTitle>
           <DialogDescription>
-            Categories become the columns on your new-tab page.
+            Sections group bookmarks while columns arrange sections and standalone bookmarks.
           </DialogDescription>
         </DialogHeader>
         <form className="editor-form" onSubmit={handleSubmit}>
           <div className="form-field">
-            <Label htmlFor="category-name">Heading</Label>
+            <Label htmlFor="section-name">Heading</Label>
             <Input
-              id="category-name"
+              id="section-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="Work, ideas, weekend"
@@ -94,16 +94,19 @@ export function CategoryEditor({
           </div>
           {isEditing && bookmarkCount > 0 && (
             <div className="form-field">
-              <Label htmlFor="category-destination">Move bookmarks to</Label>
+              <Label htmlFor="section-destination">Move contents to</Label>
               <Select
-                value={destinationCategoryId}
-                onValueChange={(value) => value && setDestinationCategoryId(value)}
+                value={destinationSectionId}
+                onValueChange={(value) => value && setDestinationSectionId(value)}
               >
-                <SelectTrigger id="category-destination" className="w-full">
-                  <SelectValue placeholder="Choose a destination" />
+                <SelectTrigger id="section-destination" className="w-full">
+                  <SelectValue>
+                    {(value) =>
+                      sections.find((item) => item.id === value)?.name ?? 'Choose a destination'}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {otherCategories.map((item) => (
+                  {destinationOptions.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.name}
                     </SelectItem>
@@ -112,8 +115,8 @@ export function CategoryEditor({
               </Select>
             </div>
           )}
-          {isEditing && otherCategories.length === 0 && (
-            <p className="form-note">Keep at least one category on the page.</p>
+          {isEditing && destinationOptions.length === 0 && (
+            <p className="form-note">Keep at least one section on the page.</p>
           )}
           {error && <p className="form-error" role="alert">{error}</p>}
           <DialogFooter className="editor-footer">
@@ -127,7 +130,7 @@ export function CategoryEditor({
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">{isEditing ? 'Save changes' : 'Add category'}</Button>
+            <Button type="submit">{isEditing ? 'Save changes' : 'Add section'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

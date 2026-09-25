@@ -3,18 +3,20 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Globe2, Pencil } from 'lucide-react'
 import type { CSSProperties, KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import type { Bookmark } from '@/types/bookmarks'
+import { getBookmarkMetrics, type Bookmark, type BookmarkScale } from '@/types/bookmarks'
 
 type SortableBookmarkProps = {
   bookmark: Bookmark
-  bookmarkHeight: number
+  bookmarkScale: BookmarkScale
+  columnIndex: number
   editMode: boolean
   onEdit: (bookmarkId: string) => void
 }
 
 export function SortableBookmark({
   bookmark,
-  bookmarkHeight,
+  bookmarkScale,
+  columnIndex,
   editMode,
   onEdit,
 }: SortableBookmarkProps) {
@@ -22,11 +24,21 @@ export function SortableBookmark({
     useSortable({
       id: bookmark.id,
       disabled: !editMode,
-      data: { type: 'bookmark', categoryId: bookmark.categoryId },
+      data: {
+        type: 'bookmark',
+        sectionId: bookmark.sectionId,
+        columnIndex,
+        containerId: bookmark.sectionId,
+      },
     })
 
+  const metrics = getBookmarkMetrics(bookmarkScale)
   const style = {
-    '--bookmark-height': `${bookmarkHeight}px`,
+    '--bookmark-height': `${metrics.height}px`,
+    '--bookmark-title-size': `${metrics.titleSize}px`,
+    '--bookmark-favicon-size': `${metrics.faviconSize}px`,
+    '--bookmark-favicon-icon-size': `${metrics.faviconIconSize}px`,
+    '--bookmark-arrow-size': `${metrics.arrowSize}px`,
     transform: CSS.Transform.toString(transform),
     transition,
   } as CSSProperties

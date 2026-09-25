@@ -1,31 +1,54 @@
 # New Tab
 
-A small, local-first new-tab page built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui.
+<p align="center">
+	<img src="./public/newtab-ui.png" alt="New Tab interface" width="1360" />
+</p>
 
-## Development
+## How to use it
+
+New Tab is a local-first start page for the links you open every day. Open the built page, then use it as your browser's new-tab page. The first launch includes a few example bookmarks that you can replace with your own.
+
+Bookmark data and layout settings are saved in your browser's local storage.
+
+## Setup
+
+Install the dependencies:
 
 ```bash
 npm install
-npm run dev
 ```
 
-The development server is available at `http://localhost:5173`.
 
-## Build For Local Use
+
+To create a build for local new-tab use:
+
+```bash
+npm run build
+```
+
+Open `dist/index.html` directly in a browser or configure it as your local new-tab page. The build uses relative asset paths so it works with `file://` URLs.
+
+## Using the tool
+
+- **Open a bookmark:** In normal mode, select any bookmark to open its URL.
+- **Enter edit mode:** Select the pencil button. Select the check button when you are finished.
+- **Add bookmarks:** Choose **Bookmark**, enter a title and a URL, then optionally assign it to a section.
+- **Layout:** Other layout options are available in edit mode.
+
+## Development
+
+Run the checks and production preview with:
 
 ```bash
 npm run lint
 npm run build
+npm run preview
 ```
 
-After the build completes, open `dist/index.html` directly in the browser or use it as the local new-tab page target. Vite is configured with relative asset paths for `file://` usage. Remote favicon lookup needs network access; bookmarks still render with a generic icon when the lookup is unavailable.
+For local development, start Vite and open `http://127.0.0.1:5173`:
 
-## Using The Page
+```bash
+npm run dev
+```
 
-- Normal mode opens bookmarks when they are clicked.
-- Edit mode adds, edits, deletes, and rearranges bookmarks and categories.
-- Drag category and bookmark handles to reorder them or move bookmarks between categories.
-- Use the edit toolbar to choose the number of columns and bookmark height.
-- Changes are stored in localStorage under `newtab.bookmarks.v1`.
-
-The first launch includes a few example bookmarks. Replace or remove them as needed.
+The development server supports Vite hot reload while source files change. The preview server serves the production build locally.
