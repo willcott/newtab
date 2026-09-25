@@ -1,7 +1,7 @@
 # New Tab
 
 <p align="center">
-	<img src="./public/newtab-ui.png" alt="New Tab interface" width="1360" />
+	<img src="./docs/newtab-ui.png" alt="New Tab interface" width="1360" />
 </p>
 
 ## How to use it
