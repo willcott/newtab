@@ -1,0 +1,614 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.968 0 0);
+  --foreground: oklch(0.23 0 0);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.23 0 0);
+  --popover: oklch(0.99 0 0);
+  --popover-foreground: oklch(0.23 0 0);
+  --primary: oklch(0.2 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.91 0 0);
+  --secondary-foreground: oklch(0.25 0 0);
+  --muted: oklch(0.925 0 0);
+  --muted-foreground: oklch(0.49 0 0);
+  --accent: oklch(0.87 0 0);
+  --accent-foreground: oklch(0.25 0 0);
+  --destructive: oklch(0.35 0 0);
+  --border: oklch(0.85 0 0);
+  --input: oklch(0.82 0 0);
+  --ring: oklch(0.2 0 0);
+  --radius: 0.5rem;
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.23 0 0);
+  --sidebar-primary: oklch(0.2 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.91 0 0);
+  --sidebar-accent-foreground: oklch(0.25 0 0);
+  --sidebar-border: oklch(0.85 0 0);
+  --sidebar-ring: oklch(0.2 0 0);
+  color-scheme: light;
+  font-family: "Geist Variable", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.19 0 0);
+    --foreground: oklch(0.93 0 0);
+    --card: oklch(0.225 0 0);
+    --card-foreground: oklch(0.93 0 0);
+    --popover: oklch(0.235 0 0);
+    --popover-foreground: oklch(0.93 0 0);
+    --primary: oklch(0.9 0 0);
+    --primary-foreground: oklch(0.2 0 0);
+    --secondary: oklch(0.29 0 0);
+    --secondary-foreground: oklch(0.91 0 0);
+    --muted: oklch(0.265 0 0);
+    --muted-foreground: oklch(0.7 0 0);
+    --accent: oklch(0.34 0 0);
+    --accent-foreground: oklch(0.92 0 0);
+    --destructive: oklch(0.75 0 0);
+    --border: oklch(1 0 0 / 13%);
+    --input: oklch(1 0 0 / 16%);
+    --ring: oklch(0.9 0 0);
+    --sidebar: oklch(0.225 0 0);
+    --sidebar-foreground: oklch(0.93 0 0);
+    --sidebar-primary: oklch(0.9 0 0);
+    --sidebar-primary-foreground: oklch(0.2 0 0);
+    --sidebar-accent: oklch(0.29 0 0);
+    --sidebar-accent-foreground: oklch(0.91 0 0);
+    --sidebar-border: oklch(1 0 0 / 13%);
+    --sidebar-ring: oklch(0.9 0 0);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: "Geist Variable", sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    min-width: 320px;
+    font-family: "Geist Variable", sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  button,
+  input {
+    font: inherit;
+    letter-spacing: 0;
+  }
+}
+
+html {
+  min-width: 320px;
+  background: var(--background);
+}
+
+body {
+  background-image:
+    linear-gradient(135deg, color-mix(in oklch, var(--accent) 18%, transparent), transparent 34%),
+    linear-gradient(315deg, color-mix(in oklch, var(--primary) 8%, transparent), transparent 42%);
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 28px clamp(20px, 4vw, 64px) 22px;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.section-heading,
+.bookmark-link,
+.edit-toolbar-actions,
+.edit-toolbar-controls,
+.toolbar-control > label,
+.drag-preview {
+  display: flex;
+  align-items: center;
+}
+
+.bookmark-empty-state p {
+  margin: 0;
+}
+
+.page-content {
+  flex: 1;
+}
+
+.edit-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
+  padding: 14px 0;
+}
+
+.edit-toolbar-controls {
+  gap: 20px;
+}
+
+.toolbar-control {
+  min-width: 120px;
+}
+
+.toolbar-control > label {
+  justify-content: flex-start;
+  margin-bottom: 8px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.toolbar-select {
+  width: 116px;
+}
+
+.toolbar-scale-control {
+  width: 142px;
+}
+
+.toolbar-scale-select {
+  width: 142px;
+}
+
+.edit-toolbar-actions {
+  gap: 8px;
+}
+
+.bookmark-grid-wrap {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.bookmark-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
+  align-items: start;
+  gap: 32px 20px;
+}
+
+.bookmark-column {
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  flex-direction: column;
+  gap: 26px;
+  border-radius: 8px;
+}
+
+.bookmark-column.is-drop-target {
+  background: color-mix(in oklch, var(--accent) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 55%, transparent);
+}
+
+.column-drop-zone {
+  min-height: 24px;
+  border: 1px dashed color-mix(in oklch, var(--border) 78%, transparent);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--card) 35%, transparent);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.column-drop-zone.is-drop-target {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--accent) 24%, transparent);
+}
+
+.section-item {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--border) 78%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--card) 42%, transparent);
+  box-shadow: 0 8px 22px color-mix(in oklch, var(--foreground) 4%, transparent);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.section-item.is-dragging,
+.bookmark-item.is-dragging {
+  opacity: 0.45;
+}
+
+.section-heading {
+  min-height: 44px;
+  gap: 8px;
+  margin: 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 72%, transparent);
+  padding: 10px 12px;
+  background: color-mix(in oklch, var(--muted) 42%, transparent);
+}
+
+.section-heading h2 {
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: 15px;
+  font-weight: 720;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-count {
+  flex: none;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 560;
+  white-space: nowrap;
+}
+
+.section-drag-handle,
+.section-collapse-button,
+.section-edit-button,
+.bookmark-action,
+.bookmark-drag-handle {
+  flex: none;
+  color: var(--muted-foreground);
+}
+
+.section-drag-handle {
+  margin-left: -6px;
+}
+
+.section-collapse-button {
+  margin-left: -6px;
+}
+
+.section-edit-button {
+  margin-left: auto;
+}
+
+.section-bookmarks {
+  display: flex;
+  min-height: 18px;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px dashed transparent;
+  border-radius: 0 0 9px 9px;
+  padding: 10px;
+  background: color-mix(in oklch, var(--background) 26%, transparent);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.section-bookmarks.is-drop-target {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--accent) 24%, transparent);
+}
+
+.bookmark-item {
+  min-width: 0;
+  height: var(--bookmark-height);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.bookmark-link {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  gap: 10px;
+  border: 1px solid color-mix(in oklch, var(--border) 86%, transparent);
+  border-radius: 8px;
+  padding: 0 10px;
+  color: var(--foreground);
+  background: color-mix(in oklch, var(--card) 72%, transparent);
+  text-decoration: none;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+
+.bookmark-link:hover,
+.bookmark-link:focus-visible {
+  border-color: color-mix(in oklch, var(--primary) 62%, var(--border));
+  background: var(--card);
+  box-shadow: 0 5px 16px color-mix(in oklch, var(--foreground) 7%, transparent);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.bookmark-link-edit {
+  cursor: pointer;
+}
+
+.bookmark-favicon {
+  position: relative;
+  display: grid;
+  width: var(--bookmark-favicon-size);
+  height: var(--bookmark-favicon-size);
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
+  border-radius: 7px;
+  background: var(--muted);
+}
+
+.bookmark-favicon-image,
+.bookmark-fallback-icon {
+  position: absolute;
+  width: var(--bookmark-favicon-icon-size);
+  height: var(--bookmark-favicon-icon-size);
+}
+
+.bookmark-favicon-image {
+  z-index: 1;
+  object-fit: contain;
+}
+
+.bookmark-favicon-image.is-hidden {
+  display: none;
+}
+
+.bookmark-fallback-icon {
+  color: var(--muted-foreground);
+}
+
+.bookmark-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--bookmark-title-size);
+  font-weight: 560;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bookmark-arrow {
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-size: var(--bookmark-arrow-size);
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.bookmark-link:hover .bookmark-arrow,
+.bookmark-link:focus-visible .bookmark-arrow {
+  opacity: 1;
+}
+
+.bookmark-actions {
+  display: flex;
+  margin-left: auto;
+  gap: 2px;
+}
+
+.bookmark-action,
+.bookmark-drag-handle {
+  opacity: 0;
+  transition: opacity 140ms ease, background-color 140ms ease;
+}
+
+.bookmark-link-edit:hover .bookmark-action,
+.bookmark-link-edit:hover .bookmark-drag-handle,
+.bookmark-link-edit:focus-within .bookmark-action,
+.bookmark-link-edit:focus-within .bookmark-drag-handle {
+  opacity: 1;
+}
+
+.section-empty {
+  display: grid;
+  min-height: var(--bookmark-height);
+  place-items: center;
+  border: 1px dashed color-mix(in oklch, var(--border) 90%, transparent);
+  border-radius: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.add-bookmark-button {
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 6px;
+  color: var(--muted-foreground);
+}
+
+.bookmark-empty-state {
+  max-width: 520px;
+  border-left: 3px solid var(--primary);
+  padding: 8px 0 8px 16px;
+}
+
+.empty-kicker {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bookmark-empty-state h2 {
+  margin: 6px 0 4px;
+  color: var(--foreground);
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.1;
+}
+
+.bookmark-empty-state p {
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+
+.bookmark-empty-state button {
+  margin-top: 14px;
+}
+
+.edit-mode-button {
+  position: fixed;
+  right: clamp(16px, 4vw, 64px);
+  bottom: clamp(16px, 3vw, 30px);
+  z-index: 20;
+}
+
+.editor-dialog {
+  max-width: 31rem;
+}
+
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-field > label {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.form-error,
+.form-note {
+  margin: -4px 0 0;
+  font-size: 12px;
+}
+
+.form-error {
+  color: var(--destructive);
+}
+
+.form-note {
+  color: var(--muted-foreground);
+}
+
+.editor-footer {
+  align-items: center;
+  margin-top: 4px;
+}
+
+.editor-footer-spacer {
+  flex: 1;
+}
+
+.drag-preview {
+  min-width: 180px;
+  gap: 9px;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  padding: 10px 13px;
+  color: var(--foreground);
+  background: var(--card);
+  box-shadow: 0 14px 30px color-mix(in oklch, var(--foreground) 18%, transparent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.drag-preview svg {
+  width: 15px;
+  height: 15px;
+  color: var(--primary);
+}
+
+@media (max-width: 980px) {
+  .bookmark-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .app-shell {
+    gap: 22px;
+    padding: 20px 16px 18px;
+  }
+
+  .bookmark-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .edit-toolbar {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .edit-toolbar-controls {
+    align-items: end;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .toolbar-scale-control,
+  .toolbar-scale-select {
+    width: min(142px, 48vw);
+  }
+
+  .edit-toolbar-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
